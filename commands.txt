@@ -1,20 +1,17 @@
 
-
+# Install the gcloud binary first
+# This uses a handy "master@gcp-personal-360619.iam.gserviceaccount.com" service account that has the necessary permissions.
 
 gcloud auth login
-TODO: Set email as Env var !!
-gcloud functions deploy gh-contributions-gizmo --entry-point main --runtime python310 --trigger-http --region=europe-west1 --project gcp-personal-360619 --set-env-vars EMAIL="PUTEMAILHERE"
-# --source src --service-account michele-test@thirdplace-pixel-test.iam.gserviceaccount.com
+
+# TODO: Add your email here
+gcloud functions deploy gh-contributions-gizmo --entry-point main --runtime python310 --trigger-http --region=europe-west1 --project gcp-personal-360619 --set-env-vars EMAIL="<MYEMAIL>"  # --source src --service-account "master@gcp-personal-360619.iam.gserviceaccount.com"
 
 gcloud projects add-iam-policy-binding gcp-personal-360619 --member="serviceAccount:gcp-personal-360619@appspot.gserviceaccount.com" --role="roles/secretmanager.secretAccessor"
 
+# TODO: Add your gh token here
 echo -n <MYTOKEN> | gcloud secrets create "gh-contributions-gizmo-token" --data-file=-
+
 gcloud secrets versions access latest --secret="gh-contributions-gizmo-token"
-
-
-
-
-
-gcloud projects add-iam-policy-binding gcp-personal-360619 --member="serviceAccount:service-351266424740@gcp-sa-cloudscheduler.iam.gserviceaccount.com" --role="roles/cloudfunctions.invoker"
 
 gcloud scheduler jobs create http gh-contributions-gizmo-job --schedule="0 12 * * *" --http-method=GET --uri=https://europe-west1-gcp-personal-360619.cloudfunctions.net/gh-contributions-gizmo --time-zone="UTC" --location europe-west1  --oidc-service-account-email="master@gcp-personal-360619.iam.gserviceaccount.com"
