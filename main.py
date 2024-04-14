@@ -9,7 +9,7 @@ from git import Repo, Actor
 from google.cloud import secretmanager
 from google.oauth2 import service_account
 
-from patches import patches
+from letters import letters
 
 
 gcp_cred_json = "gcp-personal-360619-6095cdc43f13.json"  # See credentials_and_secrets
@@ -79,17 +79,17 @@ def render_text(text):
     """
     final_patch = []
     for letter in text.lower():
-        if letter in patches:
-            width = len(patches[letter][0])
+        if letter in letters:
+            width = len(letters[letter][0])
             for i in range(width):
-                final_patch.append([row[i] for row in patches[letter]])
+                final_patch.append([row[i] for row in letters[letter]])
             # Append an empty column:
             final_patch.append([0 for _ in range(7)])
 
     return final_patch
 
 
-def create_png(patches):
+def create_png(letters):
     """Create a PNG image from the text, using the patches:
     """
     import numpy as np
@@ -99,7 +99,7 @@ def create_png(patches):
 
     img_name = "rendered_text.png"
     # Transpose the patch, and also invert 1 with 0:
-    patch = np.array(patches).T
+    patch = np.array(letters).T
     patch = 1 - patch
     # Now create the image:
     fig, ax = plt.subplots()
